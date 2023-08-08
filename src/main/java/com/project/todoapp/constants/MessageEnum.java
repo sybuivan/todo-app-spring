@@ -2,7 +2,7 @@ package com.project.todoapp.constants;
 
 public enum MessageEnum {
   REQUIRED("%s is a required field."),
-  NOT_FOUND("The %s with ID %d was not found."),
+  NOT_FOUND("The %s with ID %s was not found."),
   SUCCESS("Operation successful.");
 
   private final String message;

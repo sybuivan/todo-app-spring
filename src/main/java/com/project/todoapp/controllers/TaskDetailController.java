@@ -9,6 +9,7 @@ import com.project.todoapp.models.TaskDetail;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.request.TaskDetailRequest;
 import com.project.todoapp.payload.response.CommonResponse;
+import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.task.ITaskService;
 import com.project.todoapp.services.taskDetail.ITaskDetail;
 import com.project.todoapp.services.user.IUserService;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,7 +59,7 @@ public class TaskDetailController {
             taskMapper.taskToDto(taskDetail)));
   }
 
-  @PutMapping("/{taskDetailId}/task/{taskId}")
+  @PutMapping("/{taskDetailId}/task")
   public ResponseEntity updateTaskDetailById(
       @Valid @RequestBody TaskDetailRequest taskDetailRequest,
       @PathVariable int taskDetailId) {
@@ -69,13 +71,20 @@ public class TaskDetailController {
             taskMapper.taskToDto(taskDetail)));
   }
 
-  @GetMapping("/{taskDetailId}/task/{taskId}")
-  private ResponseEntity getTaskDetailById(@PathVariable int taskDetailId,
-      @PathVariable int taskId) {
+  @GetMapping("/{taskDetailId}/task")
+  private ResponseEntity getTaskDetailById(@PathVariable int taskDetailId) {
 
-    Optional<TaskDetail> taskDetail = taskDetailService.getTaskDetail(taskId, taskDetailId);
+    Optional<TaskDetail> taskDetail = taskDetailService.getTaskDetail(taskDetailId);
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(taskDetail);
+  }
+
+  @DeleteMapping("/{taskDetailId}/task")
+  private ResponseEntity deleteTaskDetailById(@PathVariable int taskDetailId) {
+    taskDetailService.deleteTaskDetail(taskDetailId);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new MessageResponse("Delete task detail successfully"));
   }
 }

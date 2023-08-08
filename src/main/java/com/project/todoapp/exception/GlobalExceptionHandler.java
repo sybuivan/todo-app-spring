@@ -1,6 +1,7 @@
 package com.project.todoapp.exception;
 
 import java.rmi.AlreadyBoundException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,12 @@ public class GlobalExceptionHandler {
     ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(),
         request.getDescription(false));
     return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+//  handle global LockedException
+  @ExceptionHandler(LockedException.class)
+  public ResponseEntity<String> handleLockedException(LockedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
   }
 
   @ExceptionHandler(AlreadyBoundException.class)

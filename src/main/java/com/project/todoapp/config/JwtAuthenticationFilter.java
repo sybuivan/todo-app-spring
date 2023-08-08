@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +42,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String userEmail = jwtConfig.extractUsername(jwtToken);
 
     UserDetails userDetails = customUserDetailsService.loadUserByUsername(userEmail);
+    boolean isAccountLocked = !userDetails.isAccountNonLocked();
+
+//    check isAccountLocked and send message
+    if(isAccountLocked) {
+      sendAccountLockedResponse(response);
+      return;
+    }
+
     if (jwtConfig.validateToken(jwtToken, userDetails)) {
       UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
           userDetails,
@@ -58,5 +69,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     return null;
+  }
+  private void sendAccountLockedResponse(HttpServletResponse response) throws IOException {
+    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    String message = "Account has been locked.";
+    response.getWriter().write("{\"message\": \"" + message + "\"}");
+    response.getWriter().flush();
   }
 }

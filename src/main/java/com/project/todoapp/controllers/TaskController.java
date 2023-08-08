@@ -1,5 +1,6 @@
 package com.project.todoapp.controllers;
 
+import com.project.todoapp.constants.AppConstants;
 import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.constants.StatusEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
@@ -8,6 +9,7 @@ import com.project.todoapp.models.User;
 import com.project.todoapp.payload.request.TaskRequest;
 import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.ListResponse;
+import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.task.ITaskService;
 import com.project.todoapp.services.user.IUserService;
 import jakarta.validation.Valid;
@@ -37,13 +39,9 @@ public class TaskController {
 
   @PostMapping
   public ResponseEntity createTask(@Valid @RequestBody TaskRequest taskRequest) {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-
-    User user = userService.findByEmail(userDetails.getUsername());
     Task taskNew = new Task();
     taskNew.setName(taskRequest.getName());
-    taskNew.setUser(user);
+    taskNew.setUser(userService.getUserLogin());
 
     Task task = taskService.createTask(taskNew);
 
@@ -57,7 +55,8 @@ public class TaskController {
       @PathVariable int taskId) {
 
     if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
-
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
 
     Task taskNew = new Task();
@@ -79,32 +78,45 @@ public class TaskController {
 
     taskService.deleteTaskById(taskId);
 
-    return ResponseEntity.status(HttpStatus.OK).body("Delete success");
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new MessageResponse("Delete task successfully"));
   }
 
   @GetMapping
   public ResponseEntity getAllTask(
-      @RequestParam(required = false, defaultValue = "1") String page) {
+      @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+      @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
+      @RequestParam(value = "sortBy", required = false, defaultValue = AppConstants.DEFAULT_SORT_BY_NAME) String sortBy,
+      @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir,
+      @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters) {
     User user = userService.findByEmail(userService.getUserLogin().getEmail());
-    List<Task> taskList = taskService.findAllTask(user);
 
-    System.out.println("taskList: " + taskList);
+    ListResponse<Task> taskList = taskService.findAllTask(user, filters, page, size, sortBy,
+        sortDir);
 
-    ListResponse listResponse = new ListResponse(Integer.parseInt(page), taskList.size(), taskList);
-    return ResponseEntity.status(HttpStatus.OK).body(listResponse);
+    return ResponseEntity.status(HttpStatus.OK).body(taskList);
   }
 
   @GetMapping("/{taskId}")
   public ResponseEntity getTaskById(@PathVariable int taskId) {
 
-    System.out.println("user login: " + userService.getUserLogin());
-
     if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
-      throw new ResourceNotFoundException("Task not found");
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
 
     Task task = taskService.findTaskById(taskId);
 
     return ResponseEntity.status(HttpStatus.OK).body(task);
+  }
+
+  @PutMapping("/{taskId}/completed-task")
+  public ResponseEntity completedTask(@PathVariable int taskId) {
+    if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
+    }
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new CommonResponse<>("Completed task", taskService.completedTask(taskId)));
   }
 }

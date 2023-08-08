@@ -19,5 +19,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
   @Modifying
   @Query("UPDATE User u SET u.isLocked = :isLocked WHERE u.email = :email")
   int updateLockStatus(@Param("email") String email, @Param("isLocked") boolean isLocked);
-
 }

@@ -8,10 +8,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
-public class CommonResponse<T> {
-  @NotNull
-  private String message;
+public class CommonResponse<T> extends MessageResponse{
   private T data;
+
+  public CommonResponse(@NotNull String message, T data) {
+    super(message);
+    this.data = data;
+  }
 }

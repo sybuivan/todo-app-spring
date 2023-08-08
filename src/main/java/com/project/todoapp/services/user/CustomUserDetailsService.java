@@ -21,6 +21,14 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(email).orElse(null);
 
+    boolean enabled = true;
+    boolean accountNonExpired = true;
+    boolean credentialsNonExpired = true;
+    boolean isAccountNonLocked = !user.isLocked();
+
+    System.out.println(" user.isLocked(): " +  user.isLocked());
+
+
     Set<GrantedAuthority> authorities = user
         .getRoles()
         .stream()
@@ -28,6 +36,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     return new org.springframework.security.core.userdetails.User(user.getEmail(),
         user.getPassword(),
+        enabled,
+        accountNonExpired,
+        credentialsNonExpired,
+        isAccountNonLocked,
         authorities);
   }
 }

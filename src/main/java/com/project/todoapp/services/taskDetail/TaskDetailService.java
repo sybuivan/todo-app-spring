@@ -4,7 +4,6 @@ import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.TaskDetail;
-import com.project.todoapp.models.User;
 import com.project.todoapp.repositories.TaskDetailRepository;
 import com.project.todoapp.repositories.TaskRepository;
 import com.project.todoapp.services.user.IUserService;
@@ -30,31 +29,33 @@ public class TaskDetailService implements ITaskDetail<TaskDetail, Task> {
 
   @Override
   public TaskDetail updateTaskDetail(TaskDetail td, int taskDetailId) {
-    TaskDetail taskDetailFound = taskDetailRepository.findById(taskDetailId).orElse(null);
-    if (taskDetailFound == null) {
-      throw new ResourceNotFoundException("Task detail not found" + taskDetailId);
-    }
-    taskDetailFound.setName(td.getName());
+    Optional<TaskDetail> taskDetailFound = this.getTaskDetail(taskDetailId);
 
-    return taskDetailRepository.save(td);
+    TaskDetail existingTaskDetail = taskDetailFound.get();
+    existingTaskDetail.setName(td.getName());
+    return taskDetailRepository.save(existingTaskDetail);
   }
 
   @Override
-  public int deleteTaskDetail(int taskDetailId) {
-    return 0;
+  public void deleteTaskDetail(int taskDetailId) {
+    this.checkExitsTaskDetail(taskDetailId);
+
+    taskDetailRepository.deleteById(taskDetailId);
   }
 
   @Override
-  public Optional<TaskDetail> getTaskDetail(int taskId, int taskDetailId) {
-
-    if (!this.isTaskDetailBelongsToUser(taskDetailId, userService.getUserLogin().getUserId())) {
-      throw new ResourceNotFoundException(
-          MessageEnum.NOT_FOUND.getFormattedMessage("task detail", taskDetailId));
-    }
+  public Optional<TaskDetail> getTaskDetail(int taskDetailId) {
+    this.checkExitsTaskDetail(taskDetailId);
 
     return taskDetailRepository.findById(taskDetailId);
   }
 
+  public void checkExitsTaskDetail(int taskDetailId) {
+    if (!this.isTaskDetailBelongsToUser(taskDetailId, userService.getUserLogin().getUserId())) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task detail", taskDetailId));
+    }
+  }
 
   @Override
   public boolean isTaskDetailBelongsToUser(int taskDetailId, int userId) {

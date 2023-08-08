@@ -1,17 +1,27 @@
 package com.project.todoapp.services.user;
 
 import com.project.todoapp.models.User;
+import com.project.todoapp.payload.response.ListResponse;
+import java.rmi.AlreadyBoundException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
 
 public interface IUserService {
-  User findByEmail(String email);
-  boolean existsByUsername(String username);
-  boolean existsByEmail(String email);
-  User createUser (User user);
-  List<User> getUserList();
 
-  Optional<User> updateLockStatus(String email, boolean isLocked);
+  User findByEmail(String email);
+
+  boolean existsByUsername(String username);
+
+  boolean existsByEmail(String email);
+
+  User createUser(User user);
+
+
+  ListResponse<User> getUserList(int page, int size, String filters, String sortBy,
+      String sortDir);
+
+  User updateLockStatus(String email, boolean isLocked) throws AlreadyBoundException;
 
   User getUserLogin();
 }
