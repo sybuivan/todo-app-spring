@@ -1,5 +1,6 @@
 package com.project.todoapp.controllers;
 
+import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.constants.StatusEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
@@ -31,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class TaskController {
 
-  private ITaskService taskService;
+  private ITaskService<Task, User> taskService;
   private IUserService userService;
 
   @PostMapping
@@ -55,6 +56,10 @@ public class TaskController {
   public ResponseEntity updateTask(@Valid @RequestBody TaskRequest taskRequest,
       @PathVariable int taskId) {
 
+    if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+
+    }
+
     Task taskNew = new Task();
     taskNew.setName(taskRequest.getName());
 
@@ -67,8 +72,9 @@ public class TaskController {
 
   @DeleteMapping("/{taskId}")
   public ResponseEntity deleteTask(@PathVariable int taskId) {
-    if (!taskService.existsByTaskId(taskId)) {
-      throw new ResourceNotFoundException("Task not found");
+    if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
 
     taskService.deleteTaskById(taskId);
@@ -77,13 +83,28 @@ public class TaskController {
   }
 
   @GetMapping
-  public ResponseEntity getAllTask(@RequestParam(required = false, defaultValue = "1") String page) {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-
-    User user = userService.findByEmail(userDetails.getUsername());
+  public ResponseEntity getAllTask(
+      @RequestParam(required = false, defaultValue = "1") String page) {
+    User user = userService.findByEmail(userService.getUserLogin().getEmail());
     List<Task> taskList = taskService.findAllTask(user);
+
+    System.out.println("taskList: " + taskList);
+
     ListResponse listResponse = new ListResponse(Integer.parseInt(page), taskList.size(), taskList);
     return ResponseEntity.status(HttpStatus.OK).body(listResponse);
+  }
+
+  @GetMapping("/{taskId}")
+  public ResponseEntity getTaskById(@PathVariable int taskId) {
+
+    System.out.println("user login: " + userService.getUserLogin());
+
+    if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+      throw new ResourceNotFoundException("Task not found");
+    }
+
+    Task task = taskService.findTaskById(taskId);
+
+    return ResponseEntity.status(HttpStatus.OK).body(task);
   }
 }

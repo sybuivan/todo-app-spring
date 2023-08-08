@@ -2,7 +2,7 @@ package com.project.todoapp.services.user;
 
 import com.project.todoapp.models.User;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
+import java.util.Optional;
 
 public interface IUserService {
   User findByEmail(String email);
@@ -11,5 +11,7 @@ public interface IUserService {
   User createUser (User user);
   List<User> getUserList();
 
-   ResponseEntity updateLockStatus(String email, boolean isLocked);
+  Optional<User> updateLockStatus(String email, boolean isLocked);
+
+  User getUserLogin();
 }

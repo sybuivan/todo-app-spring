@@ -4,16 +4,17 @@ import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
 import java.util.List;
 
-public interface ITaskService {
-  Task createTask(Task task);
-  Task updateTaskById(int taskId, Task task);
+public interface ITaskService<T, U> {
+  T createTask(T task);
+  T updateTaskById(int taskId, T task);
 
   void deleteTaskById(int id);
 
-  Task findTaskById(int id);
+  T findTaskById(int id);
 
-  List<Task> findAllTask(User user);
+  List<T> findAllTask(U user);
 
-  boolean existsByTaskId(int taskId);
+  boolean existsByTaskIdAndUser(int taskId, User user);
 
+  boolean completedTask(int taskId);
 }

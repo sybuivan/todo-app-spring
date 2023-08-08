@@ -1,6 +1,9 @@
 package com.project.todoapp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +27,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @NoArgsConstructor
 @Table(name = "tasks")
 public class Task {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int taskId;
@@ -41,6 +45,7 @@ public class Task {
   @JsonIgnore
   private User user;
 
-  @OneToMany(mappedBy = "task")
+  @JsonManagedReference
+  @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<TaskDetail> taskDetailList;
 }

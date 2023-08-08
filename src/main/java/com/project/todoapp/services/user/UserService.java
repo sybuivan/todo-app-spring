@@ -3,14 +3,19 @@ package com.project.todoapp.services.user;
 import com.project.todoapp.models.User;
 import com.project.todoapp.repositories.UserRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
 public class UserService implements IUserService {
 
+  @Autowired
   private UserRepository userRepository;
 
   @Override
@@ -25,7 +30,8 @@ public class UserService implements IUserService {
 
   @Override
   public boolean existsByEmail(String email) {
-    return userRepository.existsByUsername(email);
+    System.out.println("Email: " + email);
+    return userRepository.existsByEmail(email);
   }
 
   @Override
@@ -38,8 +44,17 @@ public class UserService implements IUserService {
     return userRepository.findAll();
   }
 
+  @Transactional
   @Override
-  public ResponseEntity updateLockStatus(String email, boolean isLocked) {
-    return null;
+  public Optional<User> updateLockStatus(String email, boolean isLocked) {
+    userRepository.updateLockStatus(email, isLocked);
+    return userRepository.findByEmail(email);
+  }
+
+  @Override
+  public User getUserLogin() {
+    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    return this.findByEmail(userDetails.getUsername());
   }
 }

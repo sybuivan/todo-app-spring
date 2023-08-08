@@ -3,6 +3,7 @@ package com.project.todoapp.services.task;
 import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
+import com.project.todoapp.models.TaskDetail;
 import com.project.todoapp.models.User;
 import com.project.todoapp.repositories.TaskRepository;
 import com.project.todoapp.services.user.IUserService;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class TaskService implements ITaskService {
+public class TaskService implements ITaskService<Task, User> {
 
   private TaskRepository taskRepository;
   private IUserService userService;
@@ -44,11 +45,12 @@ public class TaskService implements ITaskService {
 
   @Override
   public Task findTaskById(int taskId) {
-    Task taskFound =  taskRepository.findById(taskId).orElse(null);
+    Task taskFound = taskRepository.findById(taskId).orElse(null);
 
-    if(taskFound == null) {
-      throw new ResourceNotFoundException(MessageEnum.NOT_FOUND.getFormattedMessage("Task"));
-    };
+    if (taskFound == null) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
+    }
 
     return taskFound;
   }
@@ -59,7 +61,12 @@ public class TaskService implements ITaskService {
   }
 
   @Override
-  public boolean existsByTaskId(int taskId) {
-    return taskRepository.existsByTaskId(taskId);
+  public boolean existsByTaskIdAndUser(int taskId, User user) {
+    return taskRepository.existsByTaskIdAndUser(taskId, user);
+  }
+
+  @Override
+  public boolean completedTask(int taskId) {
+    return false;
   }
 }

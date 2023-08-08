@@ -15,7 +15,7 @@ public enum MessageEnum {
     return message;
   }
 
-  public String getFormattedMessage(String fieldName) {
-    return fieldName + message;
+  public String getFormattedMessage(Object fieldName, Object args2) {
+    return String.format(message, fieldName, args2);
   }
 }
