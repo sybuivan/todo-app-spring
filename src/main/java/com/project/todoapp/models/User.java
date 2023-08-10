@@ -2,6 +2,7 @@ package com.project.todoapp.models;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(uniqueConstraints = {
@@ -29,6 +31,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 }, name = "users")
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
   @Id

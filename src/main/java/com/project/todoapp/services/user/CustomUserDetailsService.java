@@ -26,9 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     boolean credentialsNonExpired = true;
     boolean isAccountNonLocked = !user.isLocked();
 
-    System.out.println(" user.isLocked(): " +  user.isLocked());
-
-
     Set<GrantedAuthority> authorities = user
         .getRoles()
         .stream()

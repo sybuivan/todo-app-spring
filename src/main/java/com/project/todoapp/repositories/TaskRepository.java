@@ -14,6 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
    boolean existsByTaskIdAndUser(int taskId, User user);
 
    @Query(value = "SELECT t1_0.* FROM tasks t1_0 WHERE t1_0.user_id = :userId " +
+       "AND t1_0.name like %:name%" +
        "AND (CASE WHEN :filter = 'ALL' THEN 1 " +
        "WHEN :filter = 'COMPLETED' AND t1_0.complete_date IS NOT NULL THEN 1 " +
        "WHEN :filter = 'INCOMPLETE' AND t1_0.complete_date IS NULL THEN 1 " +
@@ -24,5 +25,5 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
            "WHEN :filter = 'INCOMPLETE' AND t1_0.complete_date IS NULL THEN 1 " +
            "ELSE 0 END) = 1",
        nativeQuery = true)
-   Page<Task> findTasksByUserWithFilter(int userId, String filter, Pageable pageable);
+   Page<Task> findTasksByUserWithFilter(int userId, String name, String filter, Pageable pageable);
 }

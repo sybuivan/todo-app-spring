@@ -15,7 +15,8 @@ public interface ITaskService<T, U> {
 
   T findTaskById(int id);
 
-  ListResponse<T> findAllTask(U user, String filters, int page, int size, String sortBy,
+  ListResponse<T> findAllTask(U user, String filters, String name, int page, int size,
+      String sortBy,
       String sortDir);
 
   boolean existsByTaskIdAndUser(int taskId, User user);

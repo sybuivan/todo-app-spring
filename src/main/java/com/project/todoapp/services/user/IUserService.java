@@ -18,10 +18,14 @@ public interface IUserService {
   User createUser(User user);
 
 
-  ListResponse<User> getUserList(int page, int size, String filters, String sortBy,
+  ListResponse<User> getUserList(int page, int size, String querySearch, String filters, String sortBy,
       String sortDir);
 
   User updateLockStatus(String email, boolean isLocked) throws AlreadyBoundException;
+
+  int changePassword( String newPassword);
+
+  void resetPasswordByUser(String newPassword, String email);
 
   User getUserLogin();
 }

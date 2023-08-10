@@ -9,6 +9,7 @@ import com.project.todoapp.payload.request.LoginRequest;
 import com.project.todoapp.payload.request.RegisterRequest;
 import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.JwtResponse;
+import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.repositories.RoleRepository;
 import com.project.todoapp.services.user.IUserService;
 import jakarta.validation.Valid;
@@ -82,9 +83,9 @@ public class AuthController {
     }
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    boolean isMactch = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
+    boolean isMatch = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
-    if (isMactch) {
+    if (isMatch) {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
               loginRequest.getPassword()));
@@ -111,6 +112,6 @@ public class AuthController {
 
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new CommonResponse<>("Password does not match stored value", StatusEnum.FAILED));
+        .body(new MessageResponse("Password does not match stored value"));
   }
 }

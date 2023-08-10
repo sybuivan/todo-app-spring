@@ -53,7 +53,7 @@ public class TaskService implements ITaskService<Task, User> {
   public Task findTaskById(int taskId) {
     Task taskFound = taskRepository.findById(taskId).orElse(null);
 
-    if (this.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+    if (!this.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
       throw new ResourceNotFoundException(
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
@@ -62,19 +62,19 @@ public class TaskService implements ITaskService<Task, User> {
   }
 
   @Override
-  public ListResponse<Task> findAllTask(User user, String filters, int page, int size,
+  public ListResponse<Task> findAllTask(User user, String filters, String name, int page, int size,
       String sortBy, String sortDir) {
 
-    Pageable pageable = pageableCommon.getPageable(page, size, sortBy,sortDir);
+    Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
 
-    Page<Task> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), filters,
+    Page<Task> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, filters,
         pageable);
 
     ListResponse<Task> listResponse = new ListResponse<>();
     List<Task> listOfPosts = tasks.getContent();
 
     listResponse.setTotalData(tasks.getContent().size() == 0 ? 0 : (int) tasks.getTotalElements());
-    listResponse.setTotalPage(tasks.getContent().size() == 0 ? 0 : (int) tasks.getTotalPages());
+    listResponse.setTotalPage(tasks.getContent().size() == 0 ? 0 : tasks.getTotalPages());
     listResponse.setData(listOfPosts);
     listResponse.setPage(page);
     listResponse.setTotalCurrentData(tasks.getContent().size());

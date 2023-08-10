@@ -49,18 +49,22 @@ public class UserService implements IUserService {
   }
 
   @Override
-  public ListResponse<User> getUserList(int page, int size, String filters, String sortBy,
+  public ListResponse<User> getUserList(int page, int size,String querySearch, String filters, String sortBy,
       String sortDir) {
 
-    Pageable pageable = pageableCommon.getPageable(page, size, sortBy,sortDir);
-    Page<User> userPage = userRepository.findAll(pageable);
+    System.out.println("filter: " + filters);
+
+    Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
+    Page<User> userPage = userRepository.getUserList(querySearch, filters, pageable);
 
     List<User> userList = userPage.getContent();
 
     ListResponse listResponse = new ListResponse<>();
 
-    listResponse.setTotalData(userPage.getContent().size() == 0 ? 0 : (int) userPage.getTotalElements());
-    listResponse.setTotalPage(userPage.getContent().size() == 0 ? 0 : (int) userPage.getTotalPages());
+    listResponse.setTotalData(
+        userPage.getContent().size() == 0 ? 0 : (int) userPage.getTotalElements());
+    listResponse.setTotalPage(
+        userPage.getContent().size() == 0 ? 0 : (int) userPage.getTotalPages());
     listResponse.setPage(page);
     listResponse.setData(userMapper.toUsersDto(userList));
     listResponse.setTotalCurrentData(userList.size());
@@ -86,6 +90,28 @@ public class UserService implements IUserService {
     user.setLocked(isLocked);
 
     return user;
+  }
+
+  @Override
+  public int changePassword(String newPassword) {
+    User user = this.getUserLogin();
+    user.setPassword(newPassword);
+
+    userRepository.save(user);
+    return 0;
+  }
+
+  @Override
+  public void resetPasswordByUser(String newPassword, String email) {
+    User user = this.findByEmail(email);
+    if (user == null) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("email", email));
+    }
+
+    user.setPassword(newPassword);
+
+    userRepository.save(user);
   }
 
   @Override

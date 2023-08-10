@@ -88,10 +88,11 @@ public class TaskController {
       @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
       @RequestParam(value = "sortBy", required = false, defaultValue = AppConstants.DEFAULT_SORT_BY_NAME) String sortBy,
       @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir,
+      @RequestParam(value = "querySearch", required = false, defaultValue = AppConstants.DEFAULT_QUERY_SEARCH) String querySearch,
       @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters) {
     User user = userService.findByEmail(userService.getUserLogin().getEmail());
 
-    ListResponse<Task> taskList = taskService.findAllTask(user, filters, page, size, sortBy,
+    ListResponse<Task> taskList = taskService.findAllTask(user, filters, querySearch, page, size, sortBy,
         sortDir);
 
     return ResponseEntity.status(HttpStatus.OK).body(taskList);
@@ -99,12 +100,6 @@ public class TaskController {
 
   @GetMapping("/{taskId}")
   public ResponseEntity getTaskById(@PathVariable int taskId) {
-
-    if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
-      throw new ResourceNotFoundException(
-          MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
-    }
-
     Task task = taskService.findTaskById(taskId);
 
     return ResponseEntity.status(HttpStatus.OK).body(task);

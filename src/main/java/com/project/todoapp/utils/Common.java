@@ -2,7 +2,8 @@ package com.project.todoapp.utils;
 
 import lombok.Getter;
 import lombok.Setter;
-public interface Common {
-  String message = " is a required field.";
-  public  String messageRequired(String field);
+//@Setter
+//@Getter
+public class Common {
+  public static String message = " is a required field.";
 }
