@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 //    check isAccountLocked and send message
     if(isAccountLocked) {
-      sendAccountLockedResponse(response);
+      sendMessageError(response, "Your account is locked");
       return;
     }
 
@@ -70,10 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     return null;
   }
-  private void sendAccountLockedResponse(HttpServletResponse response) throws IOException {
+  private void sendMessageError(HttpServletResponse response, String message) throws IOException {
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    String message = "Account has been locked.";
     response.getWriter().write("{\"message\": \"" + message + "\"}");
     response.getWriter().flush();
   }

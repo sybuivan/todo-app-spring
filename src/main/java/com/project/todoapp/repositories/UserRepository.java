@@ -1,6 +1,9 @@
 package com.project.todoapp.repositories;
 
+import com.project.todoapp.dto.UserTaskStatistics;
 import com.project.todoapp.models.User;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +36,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
       + "     OR (:filter = 'false' AND u.isLocked = false))")
   Page<User> getUserList(String querySearch, String filter, Pageable pageable);
 
+  @Query("SELECT u.username AS username, " +
+      "SUM(CASE WHEN t.completeDate != null THEN 1 ELSE 0 END) AS completedTasks, " +
+      "SUM(CASE WHEN t.completeDate = null THEN 1 ELSE 0 END) AS incompleteTasks " +
+      "FROM User u " +
+      "LEFT JOIN Task t ON u.userId = t.user.userId " +
+      "WHERE (:startDate IS NULL OR t.createdTime >= :startDate) " +
+      "  AND (:endDate IS NULL OR t.createdTime <= :endDate) " +
+      "GROUP BY u.username")
+  List<UserTaskStatistics> getUserTaskStatistics(Date startDate, Date endDate);
 }

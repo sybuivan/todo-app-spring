@@ -1,6 +1,7 @@
 package com.project.todoapp.services.user;
 
 import com.project.todoapp.constants.MessageEnum;
+import com.project.todoapp.dto.UserTaskStatistics;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.mapper.UserMapper;
 import com.project.todoapp.models.User;
@@ -8,6 +9,7 @@ import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.repositories.UserRepository;
 import com.project.todoapp.utils.PageableCommon;
 import java.rmi.AlreadyBoundException;
+import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,5 +121,10 @@ public class UserService implements IUserService {
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
         .getPrincipal();
     return this.findByEmail(userDetails.getUsername());
+  }
+
+  @Override
+  public List<UserTaskStatistics> getUserTaskStatistics(Date startDate, Date endDate) {
+    return userRepository.getUserTaskStatistics(startDate, endDate);
   }
 }

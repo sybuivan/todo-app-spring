@@ -6,6 +6,7 @@ import com.project.todoapp.models.Mail;
 import com.project.todoapp.models.PasswordResetToken;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.request.PasswordForgot;
+import com.project.todoapp.payload.request.ResetPassword;
 import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.mail.IMailService;
 import com.project.todoapp.services.mail.IPasswordResetTokenService;
@@ -18,7 +19,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,7 @@ public class ForgotPasswordController {
   private IUserService userService;
   private IMailService emailService;
   private IPasswordResetTokenService passwordResetTokenService;
+  private PasswordEncoder passwordEncoder;
 
   @PostMapping("/forgot-password")
   ResponseEntity processPasswordForgot(@Valid @RequestBody PasswordForgot passwordForgot)
@@ -55,7 +57,7 @@ public class ForgotPasswordController {
     }
 
     Mail mail = new Mail();
-    String url = "http://localhost:8081/api/v1/auth/reset-password?token=" + token.getToken();
+    String url = "/reset-password?token=" + token.getToken();
 
     mail.setFrom("sybuivan1429@gmail.com");
     mail.setTo(user.getEmail());
@@ -70,6 +72,34 @@ public class ForgotPasswordController {
     mail.setModel(mailModel);
 
     emailService.send(mail);
-    return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(url));
+    return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Send email successfully"));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity resetPassword(@Valid @RequestBody ResetPassword resetPassword) {
+
+    String token = resetPassword.getToken();
+
+    PasswordResetToken passwordResetToken = passwordResetTokenService.findByToken(token)
+        .orElse(null);
+
+    if (passwordResetToken == null) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("token", token));
+    }
+
+    if (passwordResetToken.getExpirationDate().isBefore(LocalDateTime.now())) {
+      throw new RuntimeException("Token expiration");
+    }
+
+    String newPassword = resetPassword.getNewPassword();
+
+    userService.resetPasswordByUser(passwordEncoder.encode(newPassword),
+        passwordResetToken.getUser().getEmail());
+
+    passwordResetTokenService.deleteToken(token);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new MessageResponse("Reset password successfully"));
   }
 }

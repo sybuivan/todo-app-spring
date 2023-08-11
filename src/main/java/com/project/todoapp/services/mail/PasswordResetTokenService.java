@@ -5,6 +5,7 @@ import com.project.todoapp.models.PasswordResetToken;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -21,5 +22,11 @@ public class PasswordResetTokenService implements IPasswordResetTokenService {
   @Override
   public PasswordResetToken savePasswordToken(PasswordResetToken passwordResetToken) {
     return passwordResetTokenRepository.save(passwordResetToken);
+  }
+
+  @Transactional
+  @Override
+  public int deleteToken(String token) {
+    return passwordResetTokenRepository.deleteByToken(token);
   }
 }

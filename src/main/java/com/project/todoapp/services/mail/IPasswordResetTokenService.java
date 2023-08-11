@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface IPasswordResetTokenService {
   Optional<PasswordResetToken> findByToken(String token);
   PasswordResetToken savePasswordToken(PasswordResetToken passwordResetToken);
+  int deleteToken(String token);
 }

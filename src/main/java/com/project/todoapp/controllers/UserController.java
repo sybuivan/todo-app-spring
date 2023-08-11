@@ -1,16 +1,11 @@
 package com.project.todoapp.controllers;
 
 import com.project.todoapp.constants.AppConstants;
-import com.project.todoapp.constants.Common;
-import com.project.todoapp.dto.UserDto;
-import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.mapper.UserMapper;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.request.ChangePasswordRequest;
 import com.project.todoapp.payload.request.LockUserRequest;
-import com.project.todoapp.payload.request.LoginRequest;
 import com.project.todoapp.payload.request.ResetPasswordByUserRequest;
-import com.project.todoapp.payload.request.TaskRequest;
 import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.payload.response.MessageResponse;
@@ -18,16 +13,14 @@ import com.project.todoapp.services.user.IUserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.rmi.AlreadyBoundException;
-import java.util.List;
-import java.util.Optional;
+import java.util.Date;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,9 +44,10 @@ public class UserController {
       @RequestParam(value = "sortBy", required = false, defaultValue = AppConstants.DEFAULT_SORT_BY_FIRST_NAME) String sortBy,
       @RequestParam(value = "querySearch", required = false, defaultValue = AppConstants.DEFAULT_QUERY_SEARCH) String querySearch,
       @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters,
-    @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir) {
+      @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir) {
 
-    ListResponse<User> listResponse = userService.getUserList(page, size, querySearch, filters, sortBy, sortDir);
+    ListResponse<User> listResponse = userService.getUserList(page, size, querySearch, filters,
+        sortBy, sortDir);
 
     return ResponseEntity.status(HttpStatus.OK).body(listResponse);
   }
@@ -81,12 +75,19 @@ public class UserController {
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String newPassword = passwordEncoder.encode(resetPasswordByUserRequest.getNewPassword());
 
-    System.out.println("newPassword: " + newPassword);
-
     userService.resetPasswordByUser(newPassword, resetPasswordByUserRequest.getEmail());
 
     return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(
         "reset password user: " + resetPasswordByUserRequest.getEmail() + " successfully"));
+  }
+
+  @GetMapping("/admin/user-task-statistics")
+  @RolesAllowed("ROLE_ADMIN")
+  public ResponseEntity getUserTaskStatistics(
+      @RequestParam(name = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+      @RequestParam(name = "endDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(userService.getUserTaskStatistics(startDate, endDate));
   }
 
   @PostMapping("/users/change-password")

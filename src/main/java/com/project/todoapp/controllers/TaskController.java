@@ -15,6 +15,7 @@ import com.project.todoapp.services.user.IUserService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
   private ITaskService<Task, User> taskService;
+
+  @Autowired
   private IUserService userService;
 
   @PostMapping
@@ -90,6 +93,7 @@ public class TaskController {
       @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir,
       @RequestParam(value = "querySearch", required = false, defaultValue = AppConstants.DEFAULT_QUERY_SEARCH) String querySearch,
       @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters) {
+
     User user = userService.findByEmail(userService.getUserLogin().getEmail());
 
     ListResponse<Task> taskList = taskService.findAllTask(user, filters, querySearch, page, size, sortBy,

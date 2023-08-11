@@ -20,13 +20,14 @@ public class MailService implements IMailService {
   private JavaMailSender mailSender;
 
   @Override
-  public void send(Mail mail) {
-    SimpleMailMessage mailMessage = new SimpleMailMessage();
-    mailMessage.setTo(mail.getTo());
-    mailMessage.setFrom(mail.getFrom());
-    mailMessage.setSubject(mail.getSubject());
-    mailMessage.setText("Send message mail forgot password");
-    mailMessage.setText((String) mail.getModel().get("resetUrl"));
-    mailSender.send(mailMessage);
+  public void send(Mail mail) throws MessagingException {
+    MimeMessage message = mailSender.createMimeMessage();
+    MimeMessageHelper helper = new MimeMessageHelper(message, true);
+    helper.setTo(mail.getTo());
+    helper.setFrom(mail.getFrom());
+    helper.setSubject(mail.getSubject());
+    helper.setText(mail.getHtmlContent() + mail.setUrlToken(
+        (String) mail.getModel().get("resetUrl")), true);
+    mailSender.send(message);
   }
 }
