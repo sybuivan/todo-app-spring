@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
@@ -55,10 +56,16 @@ public class User {
   @OneToMany(mappedBy = "user")
   private List<Task> taskList;
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<TaskType> taskTypes;
+
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id",
       referencedColumnName = "userId"), inverseJoinColumns = @JoinColumn(name = "role_id",
       referencedColumnName = "roleId")
   )
   private Set<Role> roles;
+
+  @OneToOne(mappedBy = "user")
+  private RefreshToken refreshToken;
 }

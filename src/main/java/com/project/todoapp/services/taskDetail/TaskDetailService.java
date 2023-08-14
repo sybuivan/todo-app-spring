@@ -4,6 +4,7 @@ import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.TaskDetail;
+import com.project.todoapp.models.User;
 import com.project.todoapp.repositories.TaskDetailRepository;
 import com.project.todoapp.repositories.TaskRepository;
 import com.project.todoapp.services.user.IUserService;
@@ -17,7 +18,7 @@ public class TaskDetailService implements ITaskDetail<TaskDetail, Task> {
 
   private TaskRepository taskRepository;
   private TaskDetailRepository taskDetailRepository;
-  private IUserService userService;
+  private IUserService<User> userService;
 
   @Override
   public TaskDetail createTaskDetail(TaskDetail td, int taskId) {

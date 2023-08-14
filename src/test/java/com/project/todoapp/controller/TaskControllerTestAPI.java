@@ -1,28 +1,6 @@
 package com.project.todoapp.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.todoapp.controllers.TaskController;
-import com.project.todoapp.exception.ResourceNotFoundException;
-import com.project.todoapp.models.Task;
-import com.project.todoapp.models.User;
-import com.project.todoapp.payload.response.ListResponse;
-import com.project.todoapp.services.task.ITaskService;
-import com.project.todoapp.services.user.IUserService;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,27 +9,33 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import com.project.todoapp.controllers.TaskController;
+import com.project.todoapp.exception.ResourceNotFoundException;
+import com.project.todoapp.models.Task;
+import com.project.todoapp.models.User;
+import com.project.todoapp.payload.response.ListResponse;
+import com.project.todoapp.services.task.ITaskService;
+import com.project.todoapp.services.taskType.ITaskType;
+import com.project.todoapp.services.user.IUserService;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 //@WebMvcTest(controllers = TaskController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -69,18 +53,18 @@ public class TaskControllerTestAPI {
 
   @MockBean
   private IUserService userService;
+  @MockBean
+  private ITaskType taskTypeService;
 
   @InjectMocks
   private TaskController taskController;
-//  @Autowired
-//  private ObjectMapper objectMapper;
 
   @BeforeEach
   public void setup() {
 //    mvc = MockMvcBuilders
 //        .webAppContextSetup(webApplicationContext)
 //        .build();
-    this.mockMvc = webAppContextSetup(webApplicationContext).build();
+//    this.mockMvc = webAppContextSetup(webApplicationContext).build();
   }
 
   @Test
@@ -100,7 +84,7 @@ public class TaskControllerTestAPI {
     List<Task> taskList = new ArrayList<>();
     taskList.add(new Task(31, "task 1", new Date(),
         LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"), mockUser, null));
+        LocalDateTime.parse("2023-08-10T14:21:57"),null,null, mockUser,null, null));
 
     ListResponse<Task> listResponse = new ListResponse<>();
     listResponse.setTotalPage(1);
@@ -111,17 +95,17 @@ public class TaskControllerTestAPI {
 
     when(userService.getUserLogin()).thenReturn(mockUser);
     when(userService.findByEmail(mockUser.getEmail())).thenReturn(mockUser);
-    when(taskService.findAllTask(mockUser, filters, querySearch, page, size, sortBy,
+    when(taskService.findAllTask(mockUser, filters, 1, querySearch, page, size, sortBy,
         sortDir)).thenReturn(listResponse);
 
     // Call the controller method
     ResponseEntity<ListResponse<Task>> responseEntity = taskController.getAllTask(page, size,
-        sortBy, sortDir, querySearch, filters);
+        sortBy, sortDir, querySearch,"ALL", filters);
 
     // Assertions
     verify(userService, times(1)).getUserLogin();
     verify(userService, times(1)).findByEmail(mockUser.getEmail());
-    verify(taskService, times(1)).findAllTask(eq(mockUser), anyString(), anyString(), anyInt(),
+    verify(taskService, times(1)).findAllTask(eq(mockUser), anyString(), anyInt(), anyString(), anyInt(),
         anyInt(), anyString(), anyString());
 
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -144,7 +128,7 @@ public class TaskControllerTestAPI {
     mockUser.setUserId(1);
 
     Task mockTask = new Task(31, "task 1", new Date(), LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"), mockUser, null);
+        LocalDateTime.parse("2023-08-10T14:21:57"),null,null, mockUser,null, null);
 
     when(taskService.findTaskById(mockTask.getTaskId())).thenReturn(mockTask);
 
@@ -167,7 +151,7 @@ public class TaskControllerTestAPI {
     mockUser.setUserId(1);
 
     Task mockTask = new Task(31, "task 1", new Date(), LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"), mockUser, null);
+        LocalDateTime.parse("2023-08-10T14:21:57"), null, null, mockUser,null, null);
 
     when(userService.getUserLogin()).thenReturn(mockUser);
     when(taskService.existsByTaskIdAndUser(taskId, mockUser)).thenReturn(true);

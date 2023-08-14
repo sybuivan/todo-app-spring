@@ -9,27 +9,27 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 
-public interface IUserService {
+public interface IUserService<T> {
 
-  User findByEmail(String email);
+  T findByEmail(String email);
 
   boolean existsByUsername(String username);
 
   boolean existsByEmail(String email);
 
-  User createUser(User user);
+  T createUser(T user);
 
 
-  ListResponse<User> getUserList(int page, int size, String querySearch, String filters, String sortBy,
+  ListResponse<T> getUserList(int page, int size, String querySearch, String filters, String sortBy,
       String sortDir);
 
-  User updateLockStatus(String email, boolean isLocked) throws AlreadyBoundException;
+  T updateLockStatus(String email, boolean isLocked) throws AlreadyBoundException;
 
   int changePassword( String newPassword);
 
   void resetPasswordByUser(String newPassword, String email);
 
-  User getUserLogin();
+  T getUserLogin();
 
   List<UserTaskStatistics> getUserTaskStatistics(Date startDate, Date endDate);
 }

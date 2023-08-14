@@ -23,6 +23,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Getter
@@ -45,10 +46,20 @@ public class Task {
   @LastModifiedDate
   private LocalDateTime modifiedTime;
 
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+  private LocalDateTime dueDate;
+
+  private String description;
+
   @ManyToOne
   @JoinColumn(name = "userId", nullable = false)
   @JsonIgnore
   private User user;
+
+  @ManyToOne
+  @JoinColumn(name = "typeId")
+  @JsonIgnore
+  private TaskType taskType;
 
   @JsonManagedReference
   @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)

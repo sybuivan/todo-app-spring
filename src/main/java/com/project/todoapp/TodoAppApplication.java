@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-@PropertySource("classpath:custom-properties.properties")
+//@PropertySource("classpath:custom-properties.properties")
 @EnableJpaAuditing
 //@ComponentScan(basePackages = "com.project.todoapp")
 public class TodoAppApplication extends SpringBootServletInitializer {

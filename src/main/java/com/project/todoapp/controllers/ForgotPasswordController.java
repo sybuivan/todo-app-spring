@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class ForgotPasswordController {
 
-  private IUserService userService;
+  private IUserService<User> userService;
   private IMailService emailService;
   private IPasswordResetTokenService passwordResetTokenService;
   private PasswordEncoder passwordEncoder;

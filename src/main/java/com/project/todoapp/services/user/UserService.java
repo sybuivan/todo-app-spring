@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
-public class UserService implements IUserService {
+public class UserService implements IUserService<User> {
 
   private UserRepository userRepository;
   private PageableCommon pageableCommon;

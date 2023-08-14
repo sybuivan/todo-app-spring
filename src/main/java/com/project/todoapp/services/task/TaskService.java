@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskService implements ITaskService<Task, User> {
 
   private TaskRepository taskRepository;
-  private IUserService userService;
+  private IUserService<User> userService;
   private PageableCommon pageableCommon;
 
 
@@ -38,6 +38,14 @@ public class TaskService implements ITaskService<Task, User> {
     Task taskFound = this.findTaskById(taskId);
 
     taskFound.setName(task.getName());
+    taskFound.setTaskType(task.getTaskType());
+    if (task.getDescription() != null) {
+      taskFound.setDescription(task.getDescription());
+    }
+
+    if (task.getDueDate() != null) {
+      taskFound.setDueDate(task.getDueDate());
+    }
 
     return taskRepository.save(taskFound);
   }
@@ -62,12 +70,14 @@ public class TaskService implements ITaskService<Task, User> {
   }
 
   @Override
-  public ListResponse<Task> findAllTask(User user, String filters, String name, int page, int size,
+  public ListResponse<Task> findAllTask(User user, String filters, int typeId, String name,
+      int page, int size,
       String sortBy, String sortDir) {
 
     Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
 
-    Page<Task> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, filters,
+    Page<Task> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, typeId,
+        filters,
         pageable);
 
     ListResponse<Task> listResponse = new ListResponse<>();

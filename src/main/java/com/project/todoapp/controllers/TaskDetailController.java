@@ -41,7 +41,7 @@ public class TaskDetailController {
   private ITaskDetail<TaskDetail, Task> taskDetailService;
   private ITaskService<Task, User> taskService;
   private TaskMapper taskMapper;
-  private IUserService userService;
+  private IUserService<User> userService;
 
   @PostMapping("/task/{taskId}")
   public ResponseEntity createTaskDetail(@Valid @RequestBody TaskDetailRequest taskDetailRequest,
