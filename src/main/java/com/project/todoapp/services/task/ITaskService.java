@@ -1,5 +1,6 @@
 package com.project.todoapp.services.task;
 
+import com.project.todoapp.dto.TaskDto;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.response.ListResponse;
@@ -11,11 +12,11 @@ public interface ITaskService<T, U> {
 
   T updateTaskById(int taskId, T task);
 
-  void deleteTaskById(int id);
+  int deleteTaskById(int id);
 
   T findTaskById(int id);
 
-  ListResponse<T> findAllTask(U user, String filters, int typeId, String name, int page, int size,
+  ListResponse<TaskDto> findAllTask(U user, String filters, int typeId, String name, int page, int size,
       String sortBy,
       String sortDir);
 

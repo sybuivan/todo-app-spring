@@ -1,6 +1,7 @@
 package com.project.todoapp.payload.request;
 
 import com.project.todoapp.constants.MessageEnum;
+import com.project.todoapp.validator.NoWhitespace;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -15,6 +16,7 @@ public class RegisterRequest {
 
   //  @NotBlank(message = MessageEnum.REQUIRED.getFormattedMessage("username"))
   @NotBlank(message = "username is a required field.")
+  @NoWhitespace(message = "Username must not contain whitespace")
   private String username;
 
   @NotBlank(message = "Password is a required field.")

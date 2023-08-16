@@ -1,6 +1,7 @@
 package com.project.todoapp.controllers;
 
 import com.project.todoapp.config.JwtConfig;
+import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.constants.StatusEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.exception.TokenRefreshException;
@@ -56,12 +57,12 @@ public class AuthController {
       throws AlreadyBoundException {
 
     // add check for email exists in DB
-    if (userService.existsByEmail(registerRequest.getEmail())) {
-      throw new AlreadyBoundException("Email is already taken!");
+    if (userService.isEmailTaken(registerRequest.getEmail())) {
+      throw new AlreadyBoundException(MessageEnum.ALREADY_EXIST.getFormattedField("Email"));
     }
 
-    if (userService.existsByUsername(registerRequest.getUsername())) {
-      throw new AlreadyBoundException("Username is already taken!");
+    if (userService.isUsernameTaken(registerRequest.getUsername())) {
+      throw new AlreadyBoundException(MessageEnum.ALREADY_EXIST.getFormattedField("Username"));
     }
 
     User user = new User();
@@ -107,7 +108,7 @@ public class AuthController {
       final String token = jwtConfig.generateToken(loginRequest.getEmail(), roleList);
 
       boolean isExitsUserToken = refreshTokenService.existsByUserId(user.getUserId());
-      System.out.println("isExitsUserToken: " + isExitsUserToken);
+
       if (isExitsUserToken) {
         refreshTokenService.deleteByUserId(user.getUserId());
       }
@@ -115,7 +116,7 @@ public class AuthController {
       RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
 
       return ResponseEntity.ok(
-          new JwtResponse(token, refreshToken.getToken(), user.getUserId(), user.getUsername(),
+          new JwtResponse(token, refreshToken.getToken(), user.getUsername(),
               user.getEmail(), roleList));
 
     }

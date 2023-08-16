@@ -1,8 +1,10 @@
 package com.project.todoapp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +30,9 @@ public class TaskType {
   @NotEmpty(message = "name is not empty")
   private String name;
 
-  @OneToMany(mappedBy = "taskType", cascade = CascadeType.ALL, orphanRemoval = true)
+
+  @JsonManagedReference
+  @OneToMany(mappedBy = "taskType", cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
   private List<Task> taskList;
 
   @ManyToOne

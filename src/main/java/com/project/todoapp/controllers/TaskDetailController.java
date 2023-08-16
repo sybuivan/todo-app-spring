@@ -63,6 +63,7 @@ public class TaskDetailController {
   public ResponseEntity updateTaskDetailById(
       @Valid @RequestBody TaskDetailRequest taskDetailRequest,
       @PathVariable int taskDetailId) {
+    System.out.println("Vao day ");
     TaskDetail taskDetail = taskDetailService.updateTaskDetail(
         taskMapper.dtoToTask(taskDetailRequest), taskDetailId);
 

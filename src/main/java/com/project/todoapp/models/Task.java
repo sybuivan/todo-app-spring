@@ -1,11 +1,14 @@
 package com.project.todoapp.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -56,12 +59,13 @@ public class Task {
   @JsonIgnore
   private User user;
 
-  @ManyToOne
+  @JsonBackReference
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "typeId")
-  @JsonIgnore
   private TaskType taskType;
 
   @JsonManagedReference
   @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+//  @JsonIgnore
   private List<TaskDetail> taskDetailList;
 }

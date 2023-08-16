@@ -2,6 +2,7 @@ package com.project.todoapp.mapper;
 
 import com.project.todoapp.dto.UserDto;
 import com.project.todoapp.models.User;
+import com.project.todoapp.payload.request.UpdateInfoRequest;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,5 +17,7 @@ public interface UserMapper {
 //  @Mapping(source = "userId", target = "id")
 //  @Mapping(source = "firstName", target = "firstName")
   UserDto mapToUserDto(User user);
+
+  UpdateInfoRequest mapToUserInfo(User user);
   List<UserDto> toUsersDto(List<User> userList);
 }

@@ -29,7 +29,6 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-//  handle global LockedException
   @ExceptionHandler(LockedException.class)
   public ResponseEntity<String> handleLockedException(LockedException ex) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());

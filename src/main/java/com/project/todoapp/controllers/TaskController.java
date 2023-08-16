@@ -3,6 +3,7 @@ package com.project.todoapp.controllers;
 import com.project.todoapp.constants.AppConstants;
 import com.project.todoapp.constants.MessageEnum;
 import com.project.todoapp.constants.StatusEnum;
+import com.project.todoapp.dto.TaskDto;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.TaskType;
@@ -42,7 +43,7 @@ public class TaskController {
   @Autowired
   private IUserService<User> userService;
 
-  private ITaskType<TaskType,User> taskTypeService;
+  private ITaskType<TaskType, User> taskTypeService;
 
   @PostMapping
   public ResponseEntity createTask(@Valid @RequestBody TaskRequest taskRequest) {
@@ -97,8 +98,6 @@ public class TaskController {
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
 
-    taskService.deleteTaskById(taskId);
-
     return ResponseEntity.status(HttpStatus.OK)
         .body(new MessageResponse("Delete task successfully"));
   }
@@ -113,14 +112,17 @@ public class TaskController {
       @RequestParam(value = "typeId", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String typeId,
       @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters) {
 
-    System.out.println("tét: " + typeId.equals(AppConstants.DEFAULT_FILTER));
     int typeIdConvert = typeId.equals(AppConstants.DEFAULT_FILTER) ? 0 : Integer.parseInt(typeId);
-
-    System.out.println("typeIdConvert: " + typeIdConvert);
-
     User user = userService.findByEmail(userService.getUserLogin().getEmail());
 
-    ListResponse<Task> taskList = taskService.findAllTask(user, filters, typeIdConvert, querySearch, page,
+    if (typeIdConvert != 0 && taskTypeService.findTypeById(user, typeIdConvert) == null) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("typeId", typeIdConvert));
+    }
+
+    ListResponse<TaskDto> taskList = taskService.findAllTask(user, filters, typeIdConvert,
+        querySearch,
+        page,
         size,
         sortBy,
         sortDir);

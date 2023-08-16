@@ -1,6 +1,7 @@
 package com.project.todoapp.services.task;
 
 import com.project.todoapp.constants.MessageEnum;
+import com.project.todoapp.dto.TaskDto;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
@@ -51,10 +52,13 @@ public class TaskService implements ITaskService<Task, User> {
   }
 
   @Override
-  public void deleteTaskById(int taskId) {
-    Task taskFound = this.findTaskById(taskId);
+  @Transactional
+  public int deleteTaskById(int taskId) {
+    System.out.println("TaskID: " + taskId);
+//    return taskRepository.deleteByTaskIdAndUser(taskId, userService.getUserLogin());
 
-    taskRepository.deleteById(taskId);
+     taskRepository.delete(this.findTaskById(taskId));
+     return 0;
   }
 
   @Override
@@ -70,18 +74,17 @@ public class TaskService implements ITaskService<Task, User> {
   }
 
   @Override
-  public ListResponse<Task> findAllTask(User user, String filters, int typeId, String name,
-      int page, int size,
-      String sortBy, String sortDir) {
+  public ListResponse<TaskDto> findAllTask(User user, String filters, int typeId, String name,
+      int page, int size, String sortBy, String sortDir) {
 
     Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
 
-    Page<Task> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, typeId,
+    Page<TaskDto> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, typeId,
         filters,
         pageable);
 
-    ListResponse<Task> listResponse = new ListResponse<>();
-    List<Task> listOfPosts = tasks.getContent();
+    ListResponse<TaskDto> listResponse = new ListResponse<>();
+    List<TaskDto> listOfPosts = tasks.getContent();
 
     listResponse.setTotalData(tasks.getContent().size() == 0 ? 0 : (int) tasks.getTotalElements());
     listResponse.setTotalPage(tasks.getContent().size() == 0 ? 0 : tasks.getTotalPages());

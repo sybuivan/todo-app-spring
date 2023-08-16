@@ -6,12 +6,14 @@ import com.project.todoapp.models.User;
 import com.project.todoapp.payload.request.ChangePasswordRequest;
 import com.project.todoapp.payload.request.LockUserRequest;
 import com.project.todoapp.payload.request.ResetPasswordByUserRequest;
+import com.project.todoapp.payload.request.UpdateInfoRequest;
 import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.user.IUserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.rmi.AlreadyBoundException;
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -109,5 +112,14 @@ public class UserController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(new MessageResponse("Change password successfully"));
+  }
+
+  @PutMapping("/users/update-user-info")
+  public ResponseEntity updateUserInfo(@Valid @RequestBody @NotNull UpdateInfoRequest infoRequest)
+      throws AlreadyBoundException {
+
+    System.out.println("Vao updateInfo");
+    User userUpdate = userService.updateUserInfo(infoRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(userMapper.mapToUserInfo(userUpdate));
   }
 }

@@ -5,6 +5,7 @@ import com.project.todoapp.dto.UserTaskStatistics;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.mapper.UserMapper;
 import com.project.todoapp.models.User;
+import com.project.todoapp.payload.request.UpdateInfoRequest;
 import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.repositories.UserRepository;
 import com.project.todoapp.utils.PageableCommon;
@@ -12,7 +13,6 @@ import java.rmi.AlreadyBoundException;
 import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,13 +35,12 @@ public class UserService implements IUserService<User> {
   }
 
   @Override
-  public boolean existsByUsername(String userName) {
+  public boolean isUsernameTaken(String userName) {
     return userRepository.existsByUsername(userName);
   }
 
   @Override
-  public boolean existsByEmail(String email) {
-    System.out.println("Email: " + email);
+  public boolean isEmailTaken(String email) {
     return userRepository.existsByEmail(email);
   }
 
@@ -51,7 +50,8 @@ public class UserService implements IUserService<User> {
   }
 
   @Override
-  public ListResponse<User> getUserList(int page, int size,String querySearch, String filters, String sortBy,
+  public ListResponse<User> getUserList(int page, int size, String querySearch, String filters,
+      String sortBy,
       String sortDir) {
 
     System.out.println("filter: " + filters);
@@ -101,6 +101,32 @@ public class UserService implements IUserService<User> {
 
     userRepository.save(user);
     return 0;
+  }
+
+  @Override
+  @Transactional
+  public User updateUserInfo(UpdateInfoRequest user) throws AlreadyBoundException {
+    String email = this.getUserLogin().getEmail();
+    User userFound = this.findByEmail(email);
+
+    if (userFound == null) {
+      throw new ResourceNotFoundException(
+          MessageEnum.NOT_FOUND.getFormattedMessage("email", email));
+    }
+
+    boolean isEqualUserName = userFound.getUsername().equals(user.getUsername());
+
+    if (!isEqualUserName) {
+      if (this.isUsernameTaken(user.getUsername())) {
+        throw new AlreadyBoundException(MessageEnum.ALREADY_EXIST.getFormattedField("Username"));
+      }
+    }
+
+    userFound.setUsername(user.getUsername());
+    userFound.setLastName(user.getLastName());
+    userFound.setFirstName(user.getFirstName());
+
+    return userRepository.save(userFound);
   }
 
   @Override
