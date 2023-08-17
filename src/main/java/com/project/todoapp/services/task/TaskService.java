@@ -1,7 +1,7 @@
 package com.project.todoapp.services.task;
 
 import com.project.todoapp.constants.MessageEnum;
-import com.project.todoapp.dto.TaskDto;
+import com.project.todoapp.dto.ITaskDto;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
@@ -54,9 +54,6 @@ public class TaskService implements ITaskService<Task, User> {
   @Override
   @Transactional
   public int deleteTaskById(int taskId) {
-    System.out.println("TaskID: " + taskId);
-//    return taskRepository.deleteByTaskIdAndUser(taskId, userService.getUserLogin());
-
      taskRepository.delete(this.findTaskById(taskId));
      return 0;
   }
@@ -66,6 +63,7 @@ public class TaskService implements ITaskService<Task, User> {
     Task taskFound = taskRepository.findById(taskId).orElse(null);
 
     if (!this.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
+      System.out.println("Vao day hỉ");
       throw new ResourceNotFoundException(
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
@@ -74,17 +72,17 @@ public class TaskService implements ITaskService<Task, User> {
   }
 
   @Override
-  public ListResponse<TaskDto> findAllTask(User user, String filters, int typeId, String name,
+  public ListResponse<ITaskDto> findAllTask(User user, String filters, int typeId, String name,
       int page, int size, String sortBy, String sortDir) {
 
     Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
 
-    Page<TaskDto> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, typeId,
+    Page<ITaskDto> tasks = taskRepository.findTasksByUserWithFilter(user.getUserId(), name, typeId,
         filters,
         pageable);
 
-    ListResponse<TaskDto> listResponse = new ListResponse<>();
-    List<TaskDto> listOfPosts = tasks.getContent();
+    ListResponse<ITaskDto> listResponse = new ListResponse<>();
+    List<ITaskDto> listOfPosts = tasks.getContent();
 
     listResponse.setTotalData(tasks.getContent().size() == 0 ? 0 : (int) tasks.getTotalElements());
     listResponse.setTotalPage(tasks.getContent().size() == 0 ? 0 : tasks.getTotalPages());

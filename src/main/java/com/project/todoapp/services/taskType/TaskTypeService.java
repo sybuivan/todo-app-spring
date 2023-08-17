@@ -1,6 +1,6 @@
 package com.project.todoapp.services.taskType;
 
-import com.project.todoapp.dto.TaskTypeDto;
+import com.project.todoapp.dto.ITaskTypeDto;
 import com.project.todoapp.models.TaskType;
 import com.project.todoapp.models.User;
 import com.project.todoapp.repositories.TaskTypeRepository;
@@ -30,7 +30,13 @@ public class TaskTypeService implements ITaskType<TaskType, User> {
   }
 
   @Override
-  public List<TaskTypeDto> getTypeTaskList(User user) {
+  public List<ITaskTypeDto> getTypeTaskList(User user) {
     return taskTypeRepository.findByUser(user);
+  }
+
+  @Override
+  public TaskType updateTaskType(TaskType taskType) {
+
+    return taskTypeRepository.save(taskType);
   }
 }

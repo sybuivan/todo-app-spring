@@ -1,9 +1,8 @@
 package com.project.todoapp.repositories;
 
-import com.project.todoapp.dto.TaskDto;
+import com.project.todoapp.dto.ITaskDto;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,7 +32,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
            "WHEN :filter = 'INCOMPLETE' AND t.complete_date IS NULL THEN 1 " +
            "ELSE 0 END) = 1",
        nativeQuery = true)
-   Page<TaskDto> findTasksByUserWithFilter(int userId, String name, int typeId, String filter, Pageable pageable);
+   Page<ITaskDto> findTasksByUserWithFilter(int userId, String name, int typeId, String filter, Pageable pageable);
 
    int deleteByTaskIdAndUser(int taskId, User user);
+
 }

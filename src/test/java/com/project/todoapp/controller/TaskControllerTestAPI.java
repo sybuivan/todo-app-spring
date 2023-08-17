@@ -12,8 +12,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.project.todoapp.controllers.TaskController;
+import com.project.todoapp.dto.ITaskDto;
+import com.project.todoapp.dto.TaskInfoDto;
+import com.project.todoapp.dto.TaskTypeDto;
 import com.project.todoapp.exception.ResourceNotFoundException;
+import com.project.todoapp.mapper.TaskMapper;
 import com.project.todoapp.models.Task;
+import com.project.todoapp.models.TaskType;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.services.task.ITaskService;
@@ -56,6 +61,10 @@ public class TaskControllerTestAPI {
   @MockBean
   private ITaskType taskTypeService;
 
+  @MockBean
+  private TaskMapper taskMapper;
+
+
   @InjectMocks
   private TaskController taskController;
 
@@ -80,40 +89,69 @@ public class TaskControllerTestAPI {
     int size = 10;
     String sortBy = "name";
     String sortDir = "ASC";
+    int typeId = filters.equals("ALL") ? 0 : 2;
 
-    List<Task> taskList = new ArrayList<>();
-    taskList.add(new Task(31, "task 1", new Date(),
-        LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"),null,null, mockUser,null, null));
+    List<ITaskDto> taskList = new ArrayList<>();
+    taskList.add(new ITaskDto() {
+      @Override
+      public int getTaskId() {
+        return 10;
+      }
 
-    ListResponse<Task> listResponse = new ListResponse<>();
+      @Override
+      public String getName() {
+        return "task 1";
+      }
+
+      @Override
+      public LocalDateTime getDueDate() {
+        return null;
+      }
+
+      @Override
+      public int getTotalSubTasks() {
+        return 5;
+      }
+    });
+
+    ListResponse<ITaskDto> listResponse = new ListResponse<>();
     listResponse.setTotalPage(1);
     listResponse.setTotalData(1);
     listResponse.setPage(1);
     listResponse.setTotalCurrentData(1);
     listResponse.setData(taskList);
 
+    System.out.println("listResponse: " + listResponse);
+
+    TaskType taskType = new TaskType();
+    taskType.setName("worker");
+    taskType.setTypeId(typeId);
+
+
+
     when(userService.getUserLogin()).thenReturn(mockUser);
     when(userService.findByEmail(mockUser.getEmail())).thenReturn(mockUser);
-    when(taskService.findAllTask(mockUser, filters, 1, querySearch, page, size, sortBy,
+    when(taskTypeService.findTypeById(mockUser, typeId)).thenReturn(taskType);
+    when(taskService.findAllTask(mockUser, filters, typeId, querySearch, page, size, sortBy,
         sortDir)).thenReturn(listResponse);
 
     // Call the controller method
-    ResponseEntity<ListResponse<Task>> responseEntity = taskController.getAllTask(page, size,
-        sortBy, sortDir, querySearch,"ALL", filters);
+    ResponseEntity<ListResponse<ITaskDto>> responseEntity = taskController.getAllTask(page, size,
+        sortBy, sortDir, querySearch, "ALL", filters);
 
     // Assertions
+
     verify(userService, times(1)).getUserLogin();
     verify(userService, times(1)).findByEmail(mockUser.getEmail());
-    verify(taskService, times(1)).findAllTask(eq(mockUser), anyString(), anyInt(), anyString(), anyInt(),
+    verify(taskService, times(1)).findAllTask(eq(mockUser), anyString(), anyInt(), anyString(),
+        anyInt(),
         anyInt(), anyString(), anyString());
 
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    System.out.println("responseList: " + responseEntity + " ---- "  +  responseEntity.getBody() + responseEntity.getStatusCode());
     assertNotNull(responseEntity.getBody());
 
-    System.out.println("responseList: " + responseEntity.getBody().getData());
-
-    ListResponse<Task> responseList = responseEntity.getBody();
+    ListResponse<ITaskDto> responseList = responseEntity.getBody();
     assertEquals(1, responseList.getTotalPage());
     assertEquals(1, responseList.getTotalData());
     assertEquals(1, responseList.getPage());
@@ -123,24 +161,38 @@ public class TaskControllerTestAPI {
 
   @Test
   void getTaskId() {
-    User mockUser = new User();
-    mockUser.setEmail("sybuivan1429@gmail.com");
-    mockUser.setUserId(1);
+    // Given
+    int taskId = 1;
+    TaskType taskType = new TaskType();
+    taskType.setTypeId(1);
+    taskType.setName("Sample task");
 
-    Task mockTask = new Task(31, "task 1", new Date(), LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"),null,null, mockUser,null, null);
+    Task task = new Task();
+    task.setTaskId(taskId);
+    task.setName("Sample Task Description");
+    task.setTaskType(taskType);
 
-    when(taskService.findTaskById(mockTask.getTaskId())).thenReturn(mockTask);
+    TaskInfoDto taskInfoDTO = new TaskInfoDto();
+    taskInfoDTO.setTaskId(taskId);
+    taskInfoDTO.setDescription("Sample Task Description");
+    taskInfoDTO.setTaskType(new TaskTypeDto("worker", 1));
 
-    ResponseEntity<Task> responseEntity = taskController.getTaskById(mockTask.getTaskId());
+    when(taskService.findTaskById(taskId)).thenReturn(task);
+    when(taskMapper.dtoToTaskInfo(task)).thenReturn(taskInfoDTO);
 
-    verify(taskService, times(1)).findTaskById(anyInt());
+    // When
+    ResponseEntity responseEntity = taskController.getTaskById(taskId);
 
-    Task taskResponse = responseEntity.getBody();
+    // Then
+    assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
-    assertEquals(mockTask.getTaskId(), taskResponse.getTaskId());
-    assertEquals(mockUser, taskResponse.getUser());
-    assertEquals(LocalDateTime.parse("2023-08-10T14:21:57"), taskResponse.getCreatedTime());
+    TaskInfoDto responseBody = (TaskInfoDto) responseEntity.getBody();
+    assertNotNull(responseBody);
+    assertEquals(taskId, responseBody.getTaskId());
+    assertEquals("Sample Task Description", responseBody.getDescription());
+
+    verify(taskService, times(1)).findTaskById(taskId);
+    verify(taskMapper, times(1)).dtoToTaskInfo(task);
   }
 
   @Test
@@ -151,7 +203,7 @@ public class TaskControllerTestAPI {
     mockUser.setUserId(1);
 
     Task mockTask = new Task(31, "task 1", new Date(), LocalDateTime.parse("2023-08-10T14:21:57"),
-        LocalDateTime.parse("2023-08-10T14:21:57"), null, null, mockUser,null, null);
+        LocalDateTime.parse("2023-08-10T14:21:57"), null, null, mockUser, null, null);
 
     when(userService.getUserLogin()).thenReturn(mockUser);
     when(taskService.existsByTaskIdAndUser(taskId, mockUser)).thenReturn(true);

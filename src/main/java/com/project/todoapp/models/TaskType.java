@@ -1,6 +1,7 @@
 package com.project.todoapp.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,7 +33,7 @@ public class TaskType {
 
 
   @JsonManagedReference
-  @OneToMany(mappedBy = "taskType", cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(mappedBy = "taskType", cascade = CascadeType.ALL,orphanRemoval = true)
   private List<Task> taskList;
 
   @ManyToOne

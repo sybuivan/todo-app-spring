@@ -85,6 +85,8 @@ public class UserService implements IUserService<User> {
           MessageEnum.NOT_FOUND.getFormattedMessage("email", email));
     }
 
+    System.out.println("isLocked: " + isLocked);
+
     if (user.isLocked() == isLocked) {
       throw new AlreadyBoundException("Email: " + email + (isLocked ? " is lock" : " not locked"));
     }

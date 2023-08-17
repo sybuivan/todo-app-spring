@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public interface TaskDto {
+public interface ITaskDto {
    int getTaskId();
    String getName();
    LocalDateTime getDueDate();

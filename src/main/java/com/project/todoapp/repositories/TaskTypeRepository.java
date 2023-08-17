@@ -1,6 +1,6 @@
 package com.project.todoapp.repositories;
 
-import com.project.todoapp.dto.TaskTypeDto;
+import com.project.todoapp.dto.ITaskTypeDto;
 import com.project.todoapp.models.TaskType;
 import com.project.todoapp.models.User;
 import java.util.List;
@@ -16,7 +16,7 @@ public interface TaskTypeRepository extends JpaRepository<TaskType, Integer> {
       + "LEFT JOIN Task t ON tt.typeId = t.taskType.typeId "
       + "WHERE tt.user = :user "
       + "GROUP BY tt.name, tt.typeId")
-  List<TaskTypeDto> findByUser(User user);
+  List<ITaskTypeDto> findByUser(User user);
 
   boolean existsByNameAndUser(String name, User user);
 

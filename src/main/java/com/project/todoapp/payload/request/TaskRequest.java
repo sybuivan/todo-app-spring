@@ -9,10 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TaskRequest {
-  @NotBlank(message = "name is a required field.")
-  private String name;
-
+public class TaskRequest extends TaskNameRequest {
   private String description;
 
   @DueDateValid

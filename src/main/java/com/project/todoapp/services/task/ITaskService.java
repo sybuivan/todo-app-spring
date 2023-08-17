@@ -1,6 +1,6 @@
 package com.project.todoapp.services.task;
 
-import com.project.todoapp.dto.TaskDto;
+import com.project.todoapp.dto.ITaskDto;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.User;
 import com.project.todoapp.payload.response.ListResponse;
@@ -16,7 +16,7 @@ public interface ITaskService<T, U> {
 
   T findTaskById(int id);
 
-  ListResponse<TaskDto> findAllTask(U user, String filters, int typeId, String name, int page, int size,
+  ListResponse<ITaskDto> findAllTask(U user, String filters, int typeId, String name, int page, int size,
       String sortBy,
       String sortDir);
 

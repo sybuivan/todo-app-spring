@@ -2,12 +2,13 @@ package com.project.todoapp.controllers;
 
 import com.project.todoapp.constants.AppConstants;
 import com.project.todoapp.constants.MessageEnum;
-import com.project.todoapp.constants.StatusEnum;
-import com.project.todoapp.dto.TaskDto;
+import com.project.todoapp.dto.ITaskDto;
 import com.project.todoapp.exception.ResourceNotFoundException;
+import com.project.todoapp.mapper.TaskMapper;
 import com.project.todoapp.models.Task;
 import com.project.todoapp.models.TaskType;
 import com.project.todoapp.models.User;
+import com.project.todoapp.payload.request.TaskNameRequest;
 import com.project.todoapp.payload.request.TaskRequest;
 import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.ListResponse;
@@ -16,13 +17,11 @@ import com.project.todoapp.services.task.ITaskService;
 import com.project.todoapp.services.taskType.ITaskType;
 import com.project.todoapp.services.user.IUserService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin(origins = "http:localhost:3000", maxAge = 3600)
 @RequestMapping("/api/v1/tasks")
 @AllArgsConstructor
 public class TaskController {
@@ -45,8 +45,10 @@ public class TaskController {
 
   private ITaskType<TaskType, User> taskTypeService;
 
+  private TaskMapper taskMapper;
+
   @PostMapping
-  public ResponseEntity createTask(@Valid @RequestBody TaskRequest taskRequest) {
+  public ResponseEntity createTask(@Valid @RequestBody TaskNameRequest taskRequest) {
     Task taskNew = new Task();
     taskNew.setName(taskRequest.getName());
     taskNew.setUser(userService.getUserLogin());
@@ -98,6 +100,8 @@ public class TaskController {
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
 
+    taskService.deleteTaskById(taskId);
+
     return ResponseEntity.status(HttpStatus.OK)
         .body(new MessageResponse("Delete task successfully"));
   }
@@ -120,7 +124,7 @@ public class TaskController {
           MessageEnum.NOT_FOUND.getFormattedMessage("typeId", typeIdConvert));
     }
 
-    ListResponse<TaskDto> taskList = taskService.findAllTask(user, filters, typeIdConvert,
+    ListResponse<ITaskDto> taskList = taskService.findAllTask(user, filters, typeIdConvert,
         querySearch,
         page,
         size,
@@ -134,7 +138,7 @@ public class TaskController {
   public ResponseEntity getTaskById(@PathVariable int taskId) {
     Task task = taskService.findTaskById(taskId);
 
-    return ResponseEntity.status(HttpStatus.OK).body(task);
+    return ResponseEntity.status(HttpStatus.OK).body(taskMapper.dtoToTaskInfo(task));
   }
 
   @PutMapping("/{taskId}/completed-task")

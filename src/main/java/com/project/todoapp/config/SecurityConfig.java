@@ -1,5 +1,6 @@
 package com.project.todoapp.config;
 
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -48,24 +50,20 @@ public class SecurityConfig {
       throws Exception {
     return configuration.getAuthenticationManager();
   }
-//  @Bean
-//  public FilterRegistrationBean<CorsFilter> corsFilter() {
-//    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//    CorsConfiguration config = new CorsConfiguration();
-//    config.addAllowedOrigin("http://localhost:3000");
-//    config.addAllowedOrigin("http://localhost:8081");
-//    config.addAllowedMethod("*");
-//    config.addAllowedHeader("*");
-//    source.registerCorsConfiguration("/**", config);
-//
-//    FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-//    bean.setOrder(0);
-//    return bean;
-//  }
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(Arrays.asList("*"));
+    configuration.setAllowedMethods(Arrays.asList("*"));
+    configuration.setAllowedHeaders(Arrays.asList("*"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+  }
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf().disable().authorizeHttpRequests((authorize) ->
+    http.csrf().disable().cors().and().authorizeHttpRequests((authorize) ->
             {
               try {
                 authorize

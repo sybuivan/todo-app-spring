@@ -10,6 +10,7 @@ import com.project.todoapp.models.TaskType;
 import com.project.todoapp.models.User;
 import com.project.todoapp.services.taskType.ITaskType;
 import com.project.todoapp.services.user.IUserService;
+import com.project.todoapp.utils.Functional;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ public class TaskTypeControllerTest {
   @MockBean
   private ITaskType taskTypeService;
 
+  @MockBean
+  private Functional functional;
+
   @Test
   public void giveTaskTypeUser() {
     User user = new User();
@@ -41,12 +45,11 @@ public class TaskTypeControllerTest {
 
     List<TaskType> mockTaskTypeList = new ArrayList<>();
     mockTaskTypeList.add(new TaskType(1, "worker", null, user));
-    // Set up the mock behavior for UserService and TaskTypeService
     when(userService.getUserLogin()).thenReturn(user);
-//    when(taskTypeService.getTypeTaskList(any(User.class))).thenReturn(mockTaskTypeList);
+    when(taskTypeService.getTypeTaskList(any(User.class))).thenReturn(mockTaskTypeList);
 
     // Create the controller instance and inject the mocked services
-    TaskTypeController controller = new TaskTypeController(taskTypeService, userService);
+    TaskTypeController controller = new TaskTypeController(taskTypeService, userService, functional);
 
     ResponseEntity responseEntity = controller.getTaskTypeByUser();
     System.out.println("Body: " + responseEntity.getBody());
