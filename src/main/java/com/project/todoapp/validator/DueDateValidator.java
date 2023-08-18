@@ -21,9 +21,6 @@ public class DueDateValidator implements ConstraintValidator<DueDateValid, Local
     Instant instant = date.toInstant();
     LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-    System.out.println("Date: " + date);
-    System.out.println("LocalDateTime: " + localDateTime.isBefore(value));
-
     return localDateTime.isBefore(value);
   }
 }

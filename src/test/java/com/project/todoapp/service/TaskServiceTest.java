@@ -96,7 +96,7 @@ public class TaskServiceTest {
     when(taskRepository.save(any(Task.class))).thenReturn(updatedTask);
 
     Task result = taskService.updateTaskById(44, updatedTask);
-    
+
     assertEquals(updatedTask.getName(), result.getName());
     assertEquals(updatedTask.getTaskType(), result.getTaskType());
     assertEquals(updatedTask.getDescription(), result.getDescription());

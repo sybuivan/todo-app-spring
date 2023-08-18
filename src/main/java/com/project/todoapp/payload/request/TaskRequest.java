@@ -12,7 +12,6 @@ import lombok.Setter;
 public class TaskRequest extends TaskNameRequest {
   private String description;
 
-  @DueDateValid
   private LocalDateTime dueDate;
   private int typeId;
 }

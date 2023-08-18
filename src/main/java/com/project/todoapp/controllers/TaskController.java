@@ -88,7 +88,8 @@ public class TaskController {
 
     Task task = taskService.updateTaskById(taskId, taskNew);
 
-    CommonResponse commonResponse = new CommonResponse<>("Update task success", task);
+    CommonResponse commonResponse = new CommonResponse<>("Update task success",
+        taskMapper.dtoToTaskInfo(task));
 
     return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
   }

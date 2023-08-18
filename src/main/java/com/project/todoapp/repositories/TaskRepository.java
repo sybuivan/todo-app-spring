@@ -14,10 +14,11 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
    boolean existsByTaskIdAndUser(int taskId, User user);
 
    @Query(value = "SELECT t.name as name, t.task_id as taskId,"
-       + "t.due_date as dueDate,"
+       + "t.due_date as dueDate, tt.name as taskTypeName,"
        + " COUNT(td.task_detail_id) as totalSubTasks " +
        "FROM tasks t " +
        "LEFT JOIN task_detail td ON t.task_id = td.task_id " +
+       "LEFT JOIN task_type tt ON t.type_id = tt.type_id " +
        "WHERE t.user_id = :userId " +
        "AND t.name LIKE %:name% " +
        "AND (CASE WHEN :typeId = 0 THEN 1 ELSE t.type_id = :typeId END) " +
@@ -33,6 +34,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
            "ELSE 0 END) = 1",
        nativeQuery = true)
    Page<ITaskDto> findTasksByUserWithFilter(int userId, String name, int typeId, String filter, Pageable pageable);
+
 
    int deleteByTaskIdAndUser(int taskId, User user);
 

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 public interface ITaskDto {
    int getTaskId();
+   String getTaskTypeName();
    String getName();
    LocalDateTime getDueDate();
    int getTotalSubTasks();
