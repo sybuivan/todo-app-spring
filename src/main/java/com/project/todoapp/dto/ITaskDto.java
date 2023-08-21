@@ -1,5 +1,6 @@
 package com.project.todoapp.dto;
 
+import java.util.Date;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,4 +13,5 @@ public interface ITaskDto {
    String getName();
    LocalDateTime getDueDate();
    int getTotalSubTasks();
+   Date getCompleteDate();
 }

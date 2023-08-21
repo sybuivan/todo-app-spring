@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String jwtToken = parseJwt(request);
 
     if (jwtToken == null) {
+      System.out.println("jwtToken == null");
       filterChain.doFilter(request, response);
       return;
     }
@@ -63,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private String parseJwt(HttpServletRequest request) {
     String headerAuth = request.getHeader("Authorization");
-
+    System.out.println("headerAuth: " + headerAuth);
     if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
       return headerAuth.substring(7, headerAuth.length());
     }

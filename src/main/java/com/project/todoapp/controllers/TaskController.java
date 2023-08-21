@@ -95,7 +95,7 @@ public class TaskController {
   }
 
   @DeleteMapping("/{taskId}")
-  public ResponseEntity deleteTask(@PathVariable int taskId) {
+  public ResponseEntity<?> deleteTask(@PathVariable int taskId) {
     if (!taskService.existsByTaskIdAndUser(taskId, userService.getUserLogin())) {
       throw new ResourceNotFoundException(
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));

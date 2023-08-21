@@ -78,11 +78,12 @@ public class TaskControllerTestAPI {
 
   @Test
   void testGetTaskList() throws Exception {
-    // Arrange
+//    create object user
     User mockUser = new User();
     mockUser.setEmail("sybuivan1429@gmail.com");
     mockUser.setUserId(1);
 
+//    create filters
     String filters = "ALL";
     String querySearch = "";
     int page = 1;
@@ -99,6 +100,11 @@ public class TaskControllerTestAPI {
       }
 
       @Override
+      public String getTaskTypeName() {
+        return "worker";
+      }
+
+      @Override
       public String getName() {
         return "task 1";
       }
@@ -112,8 +118,12 @@ public class TaskControllerTestAPI {
       public int getTotalSubTasks() {
         return 5;
       }
-    });
 
+      @Override
+      public Date getCompleteDate() {
+        return null;
+      }
+    });
     ListResponse<ITaskDto> listResponse = new ListResponse<>();
     listResponse.setTotalPage(1);
     listResponse.setTotalData(1);
@@ -121,13 +131,9 @@ public class TaskControllerTestAPI {
     listResponse.setTotalCurrentData(1);
     listResponse.setData(taskList);
 
-    System.out.println("listResponse: " + listResponse);
-
     TaskType taskType = new TaskType();
     taskType.setName("worker");
     taskType.setTypeId(typeId);
-
-
 
     when(userService.getUserLogin()).thenReturn(mockUser);
     when(userService.findByEmail(mockUser.getEmail())).thenReturn(mockUser);
@@ -148,7 +154,8 @@ public class TaskControllerTestAPI {
         anyInt(), anyString(), anyString());
 
     assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-    System.out.println("responseList: " + responseEntity + " ---- "  +  responseEntity.getBody() + responseEntity.getStatusCode());
+    System.out.println("responseList: " + responseEntity + " ---- " + responseEntity.getBody()
+        + responseEntity.getStatusCode());
     assertNotNull(responseEntity.getBody());
 
     ListResponse<ITaskDto> responseList = responseEntity.getBody();

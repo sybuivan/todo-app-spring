@@ -14,7 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
    boolean existsByTaskIdAndUser(int taskId, User user);
 
    @Query(value = "SELECT t.name as name, t.task_id as taskId,"
-       + "t.due_date as dueDate, tt.name as taskTypeName,"
+       + "t.due_date as dueDate, tt.name as taskTypeName, t.complete_date as completeDate,"
        + " COUNT(td.task_detail_id) as totalSubTasks " +
        "FROM tasks t " +
        "LEFT JOIN task_detail td ON t.task_id = td.task_id " +
