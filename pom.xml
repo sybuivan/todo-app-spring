@@ -89,6 +89,11 @@
 			<artifactId>lombok-mapstruct-binding</artifactId>
 			<version>${version.mapstruct-lombok}</version>
 		</dependency>
+		<dependency>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<groupId>org.springdoc</groupId>
+			<version>2.0.4</version>
+		</dependency>
 	</dependencies>
 
 	<build>
