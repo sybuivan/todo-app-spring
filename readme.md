@@ -3,6 +3,12 @@
 This project showcases the development of an API for a Todo Management Application using Spring Boot, Spring Data JPA, and Spring Security.
 The API enables users to manage tasks, user accounts, and associated details efficiently.
 
+## Frontend (Next.js)
+
+The frontend is built using Next.js and provides a user-friendly interface for managing tasks.
+
+Frontend Repository: [https://github.com/sybuivan/todo-app-nextjs](https://github.com/sybuivan/todo-app-nextjs)
+
 # Todo App API Documentation
 
 This API documentation provides an overview of the Todo App API endpoints using the Postman collection provided. The API facilitates user and admin management, task operations, and more. The Postman collection can be accessed [here](https://www.postman.com/codtalk/workspace/todo-app/collection/14279444-12a7d112-e049-43cb-be11-fe5829b5f348).
