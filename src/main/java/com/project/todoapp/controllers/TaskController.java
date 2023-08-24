@@ -16,6 +16,8 @@ import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.task.ITaskService;
 import com.project.todoapp.services.taskType.ITaskType;
 import com.project.todoapp.services.user.IUserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "http:localhost:3000", maxAge = 3600)
 @RequestMapping("/api/v1/tasks")
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = " Task", description = "The Task API. Contains all the operations that can be performed on a Task.")
 @AllArgsConstructor
 public class TaskController {
 

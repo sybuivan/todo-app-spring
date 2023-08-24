@@ -13,6 +13,8 @@ import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.task.ITaskService;
 import com.project.todoapp.services.taskDetail.ITaskDetail;
 import com.project.todoapp.services.user.IUserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -36,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/task-detail")
 @AllArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = " TaskDetail", description = "The  TaskDetail API. Contains all the operations that can be performed on a TaskDetail.")
 public class TaskDetailController {
 
   private ITaskDetail<TaskDetail, Task> taskDetailService;

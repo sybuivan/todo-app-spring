@@ -11,6 +11,8 @@ import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.mail.IMailService;
 import com.project.todoapp.services.mail.IPasswordResetTokenService;
 import com.project.todoapp.services.user.IUserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.HashMap;

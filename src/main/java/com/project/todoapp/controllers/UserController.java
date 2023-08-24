@@ -11,6 +11,9 @@ import com.project.todoapp.payload.response.CommonResponse;
 import com.project.todoapp.payload.response.ListResponse;
 import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.user.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "User", description = "The User API. Contains all the operations that can be performed on a user.")
 public class UserController {
 
   private IUserService<User> userService;
@@ -123,6 +128,7 @@ public class UserController {
     User userUpdate = userService.updateUserInfo(infoRequest);
     return ResponseEntity.status(HttpStatus.OK).body(userMapper.mapToUserInfo(userUpdate));
   }
+
 
   @GetMapping("/users/get-me")
   public ResponseEntity getMe() throws AlreadyBoundException {

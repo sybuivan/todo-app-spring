@@ -8,6 +8,8 @@ import com.project.todoapp.payload.response.MessageResponse;
 import com.project.todoapp.services.taskType.ITaskType;
 import com.project.todoapp.services.user.IUserService;
 import com.project.todoapp.utils.Functional;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-
 @RequestMapping("/api/v1/task-type")
 @AllArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "TaskType", description = "The TaskType API. Contains all the operations that can be performed on a TaskType.")
 public class TaskTypeController {
 
   private ITaskType taskTypeService;
