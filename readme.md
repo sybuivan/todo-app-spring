@@ -17,6 +17,8 @@ This API documentation provides an overview of the Todo App API endpoints using 
 
 Please refer to the [Postman collection](https://www.postman.com/codtalk/workspace/todo-app/collection/14279444-12a7d112-e049-43cb-be11-fe5829b5f348) for detailed request and response examples for each endpoint.
 
+Or refer to the [Swagger API](https://todo-app-spring-xbn0.onrender.com/swagger-ui/index.html).
+
 ## Features
 
 ### User Management
