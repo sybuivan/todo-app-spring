@@ -2,7 +2,6 @@ package com.project.todoapp.controllers;
 
 import com.project.todoapp.config.JwtConfig;
 import com.project.todoapp.constants.MessageEnum;
-import com.project.todoapp.constants.StatusEnum;
 import com.project.todoapp.exception.ResourceNotFoundException;
 import com.project.todoapp.exception.TokenRefreshException;
 import com.project.todoapp.models.RefreshToken;
@@ -75,6 +74,7 @@ public class AuthController {
     Role roles = roleRepository.findByName(
         com.project.todoapp.constants.Role.ROLE_USER);
 
+//    set 1 role
     user.setRoles(Collections.singleton(roles));
     User userResult = userService.createUser(user);
     CommonResponse<User> userCommonResponse =
@@ -88,37 +88,40 @@ public class AuthController {
     User user = userService.findByEmail(loginRequest.getEmail());
 
     if (user == null) {
-      throw new ResourceNotFoundException("User not found with userName or email");
+      throw new ResourceNotFoundException("User not found with email");
     }
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     boolean isMatch = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
     if (isMatch) {
-      Authentication authentication = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
-              loginRequest.getPassword()));
+      try {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+                loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        List<String> roleList = authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
 
-      List<String> roleList = authentication.getAuthorities().stream()
-          .map(GrantedAuthority::getAuthority)
-          .collect(Collectors.toList());
+        final String token = jwtConfig.generateToken(loginRequest.getEmail(), roleList);
 
-      final String token = jwtConfig.generateToken(loginRequest.getEmail(), roleList);
+        boolean isExitsUserToken = refreshTokenService.existsByUserId(user.getUserId());
 
-      boolean isExitsUserToken = refreshTokenService.existsByUserId(user.getUserId());
+        if (isExitsUserToken) {
+          refreshTokenService.deleteByUserId(user.getUserId());
+        }
 
-      if (isExitsUserToken) {
-        refreshTokenService.deleteByUserId(user.getUserId());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
+
+        return ResponseEntity.ok(
+            new JwtResponse(token, refreshToken.getToken(), user.getUsername(),
+                user.getEmail(), roleList));
+      } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new MessageResponse(e.getMessage()));
       }
-
-      RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserId());
-
-      return ResponseEntity.ok(
-          new JwtResponse(token, refreshToken.getToken(), user.getUsername(),
-              user.getEmail(), roleList));
-
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(new MessageResponse("Password does not match stored value"));

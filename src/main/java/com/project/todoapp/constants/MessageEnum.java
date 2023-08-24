@@ -6,7 +6,7 @@ public enum MessageEnum {
   NOT_FOUND("The %s with ID %s was not found."),
   ALREADY_EXIST("%s is already taken"),
   UPDATE("Update %s successfully"),
-  ERROR("An error occurred."),
+  ERROR("An error occurred. %s"),
   SUCCESS("Operation successful.");
 
   private final String message;

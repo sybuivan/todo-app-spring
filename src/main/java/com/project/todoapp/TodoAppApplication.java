@@ -13,10 +13,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 //@ComponentScan(basePackages = "com.project.todoapp")
 public class TodoAppApplication extends SpringBootServletInitializer {
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(TodoAppApplication.class);
-	}
+//	@Override
+//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//		return application.sources(TodoAppApplication.class);
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(TodoAppApplication.class, args);

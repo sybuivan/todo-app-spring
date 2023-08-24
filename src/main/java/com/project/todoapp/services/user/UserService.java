@@ -54,7 +54,6 @@ public class UserService implements IUserService<User> {
       String sortBy,
       String sortDir) {
 
-    System.out.println("filter: " + filters);
 
     Pageable pageable = pageableCommon.getPageable(page, size, sortBy, sortDir);
     Page<User> userPage = userRepository.getUserList(querySearch, filters, pageable);
@@ -132,7 +131,7 @@ public class UserService implements IUserService<User> {
   }
 
   @Override
-  public void resetPasswordByUser(String newPassword, String email) {
+  public boolean resetPasswordByUser(String newPassword, String email) {
     User user = this.findByEmail(email);
     if (user == null) {
       throw new ResourceNotFoundException(
@@ -142,6 +141,7 @@ public class UserService implements IUserService<User> {
     user.setPassword(newPassword);
 
     userRepository.save(user);
+    return true;
   }
 
   @Override

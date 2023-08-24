@@ -21,6 +21,8 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(email).orElse(null);
 
+    System.out.println("Vao loadUser");
+
     boolean enabled = true;
     boolean accountNonExpired = true;
     boolean credentialsNonExpired = true;

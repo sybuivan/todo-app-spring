@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 import java.rmi.AlreadyBoundException;
 import java.util.Date;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.support.Repositories;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class UserController {
   public ResponseEntity getUserList(
       @RequestParam(value = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
       @RequestParam(value = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
-      @RequestParam(value = "sortBy", required = false, defaultValue = AppConstants.DEFAULT_SORT_BY_FIRST_NAME) String sortBy,
+      @RequestParam(value = "sortBy", required = false, defaultValue = AppConstants.DEFAULT_SORT_BY_USERNAME) String sortBy,
       @RequestParam(value = "querySearch", required = false, defaultValue = AppConstants.DEFAULT_QUERY_SEARCH) String querySearch,
       @RequestParam(value = "filters", required = false, defaultValue = AppConstants.DEFAULT_FILTER) String filters,
       @RequestParam(value = "sortDir", required = false, defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDir) {
@@ -73,9 +74,9 @@ public class UserController {
 
   @PostMapping("/admin/reset-password-by-user")
   @RolesAllowed("ROLE_ADMIN")
-  private ResponseEntity resetPasswordByUser(
+  public ResponseEntity resetPasswordByUser(
       @Valid @RequestBody ResetPasswordByUserRequest resetPasswordByUserRequest) {
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String newPassword = passwordEncoder.encode(resetPasswordByUserRequest.getNewPassword());
 
     userService.resetPasswordByUser(newPassword, resetPasswordByUserRequest.getEmail());
@@ -93,7 +94,7 @@ public class UserController {
         .body(userService.getUserTaskStatistics(startDate, endDate));
   }
 
-  @PostMapping("/users/change-password")
+  @PutMapping("/users/change-password")
   public ResponseEntity changePassword(
       @Valid @RequestBody ChangePasswordRequest changePasswordRequest) throws Exception {
 
@@ -105,7 +106,8 @@ public class UserController {
     boolean isMatch = passwordEncoder.matches(changePasswordRequest.getOldPassword(), password);
 
     if (!isMatch) {
-      throw new Exception("Password does not match stored value");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body(new MessageResponse("Password does not match stored value"));
     }
 
     userService.changePassword(newPassword);
@@ -118,8 +120,14 @@ public class UserController {
   public ResponseEntity updateUserInfo(@Valid @RequestBody @NotNull UpdateInfoRequest infoRequest)
       throws AlreadyBoundException {
 
-    System.out.println("Vao updateInfo");
     User userUpdate = userService.updateUserInfo(infoRequest);
     return ResponseEntity.status(HttpStatus.OK).body(userMapper.mapToUserInfo(userUpdate));
+  }
+
+  @GetMapping("/users/get-me")
+  public ResponseEntity getMe() throws AlreadyBoundException {
+
+    User user = userService.getUserLogin();
+    return ResponseEntity.status(HttpStatus.OK).body(userMapper.mapToUserInfo(user));
   }
 }

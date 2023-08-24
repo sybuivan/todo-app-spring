@@ -12,6 +12,7 @@ public interface IUserService<T> {
 
   T findByEmail(String email);
 
+
   boolean isUsernameTaken(String username);
 
   boolean isEmailTaken(String email);
@@ -27,6 +28,6 @@ public interface IUserService<T> {
   T updateUserInfo(UpdateInfoRequest user) throws AlreadyBoundException;
   T getUserLogin();
 
-  void resetPasswordByUser(String newPassword, String email);
+  boolean resetPasswordByUser(String newPassword, String email);
   List<UserTaskStatistics> getUserTaskStatistics(Date startDate, Date endDate);
 }

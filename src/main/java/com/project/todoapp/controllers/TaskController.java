@@ -39,12 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
   private ITaskService<Task, User> taskService;
-
-  @Autowired
   private IUserService<User> userService;
-
   private ITaskType<TaskType, User> taskTypeService;
-
   private TaskMapper taskMapper;
 
   @PostMapping
@@ -54,11 +50,16 @@ public class TaskController {
     taskNew.setUser(userService.getUserLogin());
     taskNew.setTaskType(null);
 
-    Task task = taskService.createTask(taskNew);
+    try {
+      Task task = taskService.createTask(taskNew);
+      CommonResponse commonResponse = new CommonResponse<Task>("Create task success", task);
+      return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
+    } catch (Exception e) {
+      MessageResponse errorResponse = new MessageResponse(
+          MessageEnum.ERROR.getFormattedField(e.getMessage()));
 
-    CommonResponse commonResponse = new CommonResponse<Task>("Create task success", task);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
   }
 
   @PutMapping("/{taskId}")
@@ -86,12 +87,19 @@ public class TaskController {
     taskNew.setName(taskRequest.getName());
     taskNew.setDueDate(taskRequest.getDueDate());
 
-    Task task = taskService.updateTaskById(taskId, taskNew);
+    try {
+      Task task = taskService.updateTaskById(taskId, taskNew);
 
-    CommonResponse commonResponse = new CommonResponse<>("Update task success",
-        taskMapper.dtoToTaskInfo(task));
+      CommonResponse commonResponse = new CommonResponse<>("Update task success",
+          taskMapper.dtoToTaskInfo(task));
 
-    return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+      return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    } catch (Exception e) {
+      MessageResponse errorResponse = new MessageResponse(
+          MessageEnum.ERROR.getFormattedField(e.getMessage()));
+
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
   }
 
   @DeleteMapping("/{taskId}")
@@ -100,11 +108,17 @@ public class TaskController {
       throw new ResourceNotFoundException(
           MessageEnum.NOT_FOUND.getFormattedMessage("task", taskId));
     }
+    try {
+      taskService.deleteTaskById(taskId);
 
-    taskService.deleteTaskById(taskId);
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(new MessageResponse("Delete task successfully"));
+    } catch (Exception e) {
+      MessageResponse errorResponse = new MessageResponse(
+          MessageEnum.ERROR.getFormattedField(e.getMessage()));
 
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new MessageResponse("Delete task successfully"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
   }
 
   @GetMapping
